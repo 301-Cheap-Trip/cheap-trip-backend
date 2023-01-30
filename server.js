@@ -41,6 +41,37 @@ async function getGas(request, response, next) {
   }
 }
 
+app.get('/directions', getDirections);
+
+async function getDirections(request, response, next) {
+
+  
+  
+  try {
+
+    let url = `http://api.openweathermap.org/geo/1.0/direct?q=Seattle,WA&limit=1&appid=${process.env.LOCATION_API_KEY}`
+
+    let url2 = `http://api.openweathermap.org/geo/1.0/direct?q=Denver,CO&limit=1&appid=${process.env.LOCATION_API_KEY}`
+    
+    let cityOneData = await axios.get(url);
+    let cityTwoData = await axios.get(url2);
+
+    let latOne = cityOneData.data[0].lat;
+    let lonOne = cityOneData.data[0].lon;
+
+    
+    let latTwo = cityTwoData.data[0].lat;
+    let lonTwo = cityTwoData.data[0].lon;
+
+    let directionData = await axios.get(`https://us1.locationiq.com/v1/directions/driving/${latOne},${lonOne};${latTwo},${lonTwo}?key=${process.env.LOCATION_API_KEY_TWO}&geometries=geojson&overview=full`)
+
+    response.status(200).send(cityOneData.data);
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
 class GasPrice {
   constructor(gasObj) {
     this.name = gasObj.lowerName;
