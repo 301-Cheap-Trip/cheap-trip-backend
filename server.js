@@ -73,14 +73,24 @@ async function getDirections(request, response, next) {
     let latTwo = cityTwoData.data[0].lat;
     let lonTwo = cityTwoData.data[0].lon;
 
-    let directionData = await axios.get(`https://us1.locationiq.com/v1/directions/driving/${lonOne},${latOne};${lonTwo},${latTwo}?key=${process.env.LOCATION_API_KEY_TWO}&geometries=geojson&overview=full`)
+    let url3 = `https://us1.locationiq.com/v1/directions/driving/${lonOne},${latOne};${lonTwo},${latTwo}?key=${process.env.LOCATION_API_KEY_TWO}&geometries=geojson&overview=simplified`
+    let directionData = await axios.get(url3)
+    console.log(url3)
 
-    response.status(200).send(directionData.data);
+    let groomData = directionData.data.routes[0].legs[0];
+    let dataToSend = new Directions(groomData);
+
+
+
+
+    response.status(200).send(dataToSend);
 
   } catch (error) {
     next(error)
   }
 }
+
+
 
 class GasPrice {
   constructor(gasObj) {
@@ -96,7 +106,13 @@ class GasPrice {
 }
 
 
+class Directions {
+  constructor(directionObj){
+    this.duration = directionObj.duration;
+    this.distance = directionObj.distance;
+  }
 
+}
 
 
 
