@@ -11,7 +11,7 @@ const tripSchema = new Schema({
   tripDestination: { type: String, required: true },
   gasMileage: { type: Number, required: true },
   username: { type: String, required: true },
-  gasPrice: { type: Number, required: false },
+  gasPrice: { type: Number, required: true },
 });
 
 const TripModel = mongoose.model('trip', tripSchema);
