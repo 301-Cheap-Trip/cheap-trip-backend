@@ -96,7 +96,7 @@ async function postTrip(request, response, next) {
   }
 }
 
-app.put('trips/:tripID', updateTrip)
+app.put('/trips/:tripID', updateTrip)
 
 async function updateTrip(request, response, next) {
   try {
@@ -111,10 +111,12 @@ async function updateTrip(request, response, next) {
     next(error);
   }
 
-  app.delete('/trips/:tripID', deleteTrip)
+  app.delete('/trips/:tripID', deleteTrip);
 
   async function deleteTrip(request, response, next) {
     try {
+      console.log(request.params);
+      console.log(request.params.tripID);
       let id = request.params.tripID;
 
       await Trip.findByIdAndDelete(id);
