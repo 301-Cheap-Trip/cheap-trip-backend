@@ -71,7 +71,7 @@ async function getDirections(request, response, next) {
     let latTwo = cityTwoData.data[0].lat;
     let lonTwo = cityTwoData.data[0].lon;
 
-    let directionData = await axios.get(`https://us1.locationiq.com/v1/directions/driving/${latOne},${lonOne};${latTwo},${lonTwo}?key=${process.env.LOCATION_API_KEY_TWO}&geometries=geojson&overview=full`)
+    let directionData = await axios.get(`https://us1.locationiq.com/v1/directions/driving/${lonOne},${latOne};${lonTwo},${latTwo}?key=${process.env.LOCATION_API_KEY_TWO}&geometries=geojson&overview=full`)
 
     response.status(200).send(directionData.data);
     
