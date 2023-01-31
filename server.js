@@ -51,30 +51,32 @@ app.get('/directions', getDirections);
 
 async function getDirections(request, response, next) {
 
-  
-  
+
+
   try {
 
-    let url = `http://api.openweathermap.org/geo/1.0/direct?q=Seattle,Washington&limit=1&appid=${process.env.LOCATION_API_KEY}`
+    let cityOne = request.query.cityOne;
+    let cityTwo = request.query.cityTwo;
 
-    let url2 = `http://api.openweathermap.org/geo/1.0/direct?q=Denver,Colorado&limit=1&appid=${process.env.LOCATION_API_KEY}`
-    
+    let url = `http://api.openweathermap.org/geo/1.0/direct?q=${cityOne}&limit=1&appid=${process.env.LOCATION_API_KEY}`
+    let url2 = `http://api.openweathermap.org/geo/1.0/direct?q=${cityTwo}&limit=1&appid=${process.env.LOCATION_API_KEY}`
+
     let cityOneData = await axios.get(url);
     let cityTwoData = await axios.get(url2);
-    
+
 
     let latOne = cityOneData.data[0].lat;
     console.log(latOne);
     let lonOne = cityOneData.data[0].lon;
 
-    
+
     let latTwo = cityTwoData.data[0].lat;
     let lonTwo = cityTwoData.data[0].lon;
 
     let directionData = await axios.get(`https://us1.locationiq.com/v1/directions/driving/${lonOne},${latOne};${lonTwo},${latTwo}?key=${process.env.LOCATION_API_KEY_TWO}&geometries=geojson&overview=full`)
 
     response.status(200).send(directionData.data);
-    
+
   } catch (error) {
     next(error)
   }
