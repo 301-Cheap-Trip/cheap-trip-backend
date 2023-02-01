@@ -96,6 +96,28 @@ async function getDirections(request, response, next) {
   }
 }
 
+// app.get('/vehicle', getVehicle)
+
+// async function getVehicle(request, response, next) {
+
+// try {
+//   let year = request.query.year;
+//   let make = request.query.make;
+//   let model = request.query.model;
+//   let url = `https://fueleconomy.gov/ws/rest/vehicle/menu/options?year=${year}&make=${make}&model=${model}`
+//   console.log(url)
+//   let vehicleData = await axios.get(url)
+//   console.log(vehicleData.data);
+
+//   response.status(200).send(vehicleData.data);
+
+// } catch (error) {
+//   next(error)
+// }
+
+
+// }
+
 app.post('/trips', postTrip)
 
 async function postTrip(request, response, next) {
