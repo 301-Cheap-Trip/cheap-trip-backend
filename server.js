@@ -10,7 +10,7 @@ const Trip = require('./models/trips.js')
 
 
 app.use(cors());
-// app.use(express.json());
+app.use(express.json());
 mongoose.connect(process.env.DB_URL);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -89,9 +89,11 @@ app.post('/trips', postTrip)
 async function postTrip(request, response, next) {
   try {
     let createdTrip = await Trip.create(request.body);
-    response.status(200).send(createdTrip);
+    console.log(request.body);
+    response.status(201).send(createdTrip);
 
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -110,24 +112,26 @@ async function updateTrip(request, response, next) {
   } catch (error) {
     next(error);
   }
+  
+  
 
-  app.delete('/trips/:tripID', deleteTrip);
 
-  async function deleteTrip(request, response, next) {
-    try {
-      console.log(request.params);
-      console.log(request.params.tripID);
-      let id = request.params.tripID;
 
-      await Trip.findByIdAndDelete(id);
+}
+app.delete('/trips/:tripID', deleteTrip);
+async function deleteTrip(request, response, next) {
+  try {
+    console.log(request.params);
+    console.log(request.params.tripID);
+    let id = request.params.tripID;
 
-      response.status(200).send('Trip Deleted')
+    await Trip.findByIdAndDelete(id);
 
-    } catch (error) {
-      next(error);
-    }
+    response.status(200).send('Trip Deleted')
+
+  } catch (error) {
+    next(error);
   }
-
 }
 
 app.get('/trips', getTrips);
@@ -135,7 +139,6 @@ app.get('/trips', getTrips);
 async function getTrips(request, response, next) {
   try {
     let allTrips = await Trip.find({});
-
     response.status(200).send(allTrips)
 
   } catch (error) {
@@ -163,6 +166,7 @@ class Directions {
 }
 
 app.get('*', (request, response) => {
+  console.log(request)
   response.status(404).send('This page does not exist');
 });
 
