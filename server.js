@@ -7,7 +7,7 @@ const app = express();
 const cors = require('cors');
 const axios = require('axios')
 const Trip = require('./models/trips.js');
-const verifyUser = require('./auth');
+// const verifyUser = require('./auth');
 
 
 
@@ -27,7 +27,7 @@ app.get('/', (request, response) => {
   response.status(200).send('Cheap Trip is Live');
 });
 
-app.use(verifyUser);
+// app.use(verifyUser);
 
 app.get('/gas', getGas);
 
@@ -60,9 +60,13 @@ async function getDirections(request, response, next) {
 
     let cityOne = request.query.cityOne;
     let cityTwo = request.query.cityTwo;
+    let stateOne = request.query.stateOne;
+    let stateTwo = request.query.stateTwo;
 
-    let url = `http://api.openweathermap.org/geo/1.0/direct?q=${cityOne}&limit=1&appid=${process.env.WEATHER_API_KEY}`
-    let url2 = `http://api.openweathermap.org/geo/1.0/direct?q=${cityTwo}&limit=1&appid=${process.env.WEATHER_API_KEY}`
+
+    let url = `http://api.openweathermap.org/geo/1.0/direct?q=${cityOne},${stateOne},us&limit=1&appid=${process.env.WEATHER_API_KEY}`
+    let url2 = `http://api.openweathermap.org/geo/1.0/direct?q=${cityTwo},${stateTwo},us&limit=1&appid=${process.env.WEATHER_API_KEY}`
+
 
     let cityOneData = await axios.get(url);
     let cityTwoData = await axios.get(url2);
@@ -74,7 +78,7 @@ async function getDirections(request, response, next) {
     let destLon = cityTwoData.data[0].lon;
     
     let url3 = `https://us1.locationiq.com/v1/directions/driving/${originLon},${originLat};${destLon},${destLat}?key=${process.env.LOCATIONIQ_API_KEY}&geometries=geojson&overview=simplified`
-
+  
     let directionData = await axios.get(url3)
     
     
@@ -95,6 +99,28 @@ async function getDirections(request, response, next) {
     next(error)
   }
 }
+
+// app.get('/vehicle', getVehicle)
+
+// async function getVehicle(request, response, next) {
+
+// try {
+//   let year = request.query.year;
+//   let make = request.query.make;
+//   let model = request.query.model;
+//   let url = `https://fueleconomy.gov/ws/rest/vehicle/menu/options?year=${year}&make=${make}&model=${model}`
+//   console.log(url)
+//   let vehicleData = await axios.get(url)
+//   console.log(vehicleData.data);
+
+//   response.status(200).send(vehicleData.data);
+
+// } catch (error) {
+//   next(error)
+// }
+
+
+// }
 
 app.post('/trips', postTrip)
 
