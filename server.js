@@ -6,7 +6,9 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const axios = require('axios')
-const Trip = require('./models/trips.js')
+const Trip = require('./models/trips.js');
+const verifyUser = require('./auth');
+
 
 
 app.use(cors());
@@ -24,6 +26,8 @@ const PORT = process.env.PORT || 3003;
 app.get('/', (request, response) => {
   response.status(200).send('Cheap Trip is Live');
 });
+
+app.use(verifyUser);
 
 app.get('/gas', getGas);
 
@@ -57,26 +61,34 @@ async function getDirections(request, response, next) {
     let cityOne = request.query.cityOne;
     let cityTwo = request.query.cityTwo;
 
-    let url = `http://api.openweathermap.org/geo/1.0/direct?q=${cityOne}&limit=1&appid=${process.env.LOCATION_API_KEY}`
-    let url2 = `http://api.openweathermap.org/geo/1.0/direct?q=${cityTwo}&limit=1&appid=${process.env.LOCATION_API_KEY}`
+    let url = `http://api.openweathermap.org/geo/1.0/direct?q=${cityOne}&limit=1&appid=${process.env.WEATHER_API_KEY}`
+    let url2 = `http://api.openweathermap.org/geo/1.0/direct?q=${cityTwo}&limit=1&appid=${process.env.WEATHER_API_KEY}`
 
     let cityOneData = await axios.get(url);
     let cityTwoData = await axios.get(url2);
 
-    let latOne = cityOneData.data[0].lat;
-    console.log(latOne);
-    let lonOne = cityOneData.data[0].lon;
+    let originLat = cityOneData.data[0].lat;
+    let originLon = cityOneData.data[0].lon;
 
-    let latTwo = cityTwoData.data[0].lat;
-    let lonTwo = cityTwoData.data[0].lon;
+    let destLat = cityTwoData.data[0].lat;
+    let destLon = cityTwoData.data[0].lon;
+    
+    let url3 = `https://us1.locationiq.com/v1/directions/driving/${originLon},${originLat};${destLon},${destLat}?key=${process.env.LOCATIONIQ_API_KEY}&geometries=geojson&overview=simplified`
 
-    let url3 = `https://us1.locationiq.com/v1/directions/driving/${lonOne},${latOne};${lonTwo},${latTwo}?key=${process.env.LOCATION_API_KEY_TWO}&geometries=geojson&overview=simplified`
     let directionData = await axios.get(url3)
-    console.log(url3)
-
+    
+    
+    
+    let center = [];
+    center = directionData.data.routes[0].geometry.coordinates[(Math.floor(directionData.data.routes[0].geometry.coordinates.length / 2))];
+ 
+    let centerLat = center[0];
+    let centerLon = center[1];
+   
     let groomData = directionData.data.routes[0].legs[0];
-    let dataToSend = new Directions(groomData);
 
+    let dataToSend = new Directions(groomData, centerLat, centerLon, originLat, originLon, destLat, destLon);
+    
     response.status(200).send(dataToSend);
 
   } catch (error) {
@@ -158,9 +170,15 @@ class GasPrice {
 }
 
 class Directions {
-  constructor(directionObj) {
+  constructor(directionObj, centerLat, centerLon, originLat, originLon, destLat, destLon) {
     this.duration = directionObj.duration;
     this.distance = directionObj.distance;
+    this.originLat = originLat;
+    this.originLon = originLon;
+    this.destLat = destLat;
+    this.destLon = destLon;
+    this.centerLat = centerLat;
+    this.centerLon = centerLon;
   }
 
 }
