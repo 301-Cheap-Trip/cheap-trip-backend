@@ -7,7 +7,7 @@ const app = express();
 const cors = require('cors');
 const axios = require('axios')
 const Trip = require('./models/trips.js');
-// const verifyUser = require('./auth');
+const verifyUser = require('./auth');
 
 
 
