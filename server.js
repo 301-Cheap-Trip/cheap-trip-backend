@@ -27,7 +27,7 @@ app.get('/', (request, response) => {
   response.status(200).send('Cheap Trip is Live');
 });
 
-app.use(verifyUser);
+
 
 app.get('/gas', getGas);
 
@@ -96,12 +96,14 @@ async function getDirections(request, response, next) {
   }
 }
 
+app.use(verifyUser);
+
 app.post('/trips', postTrip)
 
 async function postTrip(request, response, next) {
   try {
-    let createdTrip = await Trip.create(request.body);
-    console.log(request.body);
+    let createdTrip = await Trip.create({...request.body, email: request.user.email});
+    console.log(createdTrip);
     response.status(201).send(createdTrip);
 
   } catch (error) {
@@ -110,6 +112,8 @@ async function postTrip(request, response, next) {
   }
 }
 
+
+
 app.put('/trips/:tripID', updateTrip)
 
 async function updateTrip(request, response, next) {
@@ -117,8 +121,8 @@ async function updateTrip(request, response, next) {
     let id = request.params.tripID;
     let data = request.body;
 
-    const updatedTrip = await Trip.findByIdAndUpdate(id, data, { new: true, overwrite: true })
-
+    const updatedTrip = await Trip.findByIdAndUpdate(id, {...data, email: request.user.email}, { new: true, overwrite: true })
+    console.log(updatedTrip)
     response.status(200).send(updatedTrip);
 
   } catch (error) {
@@ -150,7 +154,7 @@ app.get('/trips', getTrips);
 
 async function getTrips(request, response, next) {
   try {
-    let allTrips = await Trip.find({});
+    let allTrips = await Trip.find({email: request.user.email});
     response.status(200).send(allTrips)
 
   } catch (error) {
