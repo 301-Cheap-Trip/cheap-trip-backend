@@ -202,7 +202,7 @@ class GasPrice {
 
 class Directions {
   constructor(directionObj, centerLat, centerLon, originLat, originLon, destLat, destLon) {
-    this.duration = directionObj.duration;
+    this.duration = directionObj.duration * .82;
     this.distance = directionObj.distance;
     this.originLat = originLat;
     this.originLon = originLon;
